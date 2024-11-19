@@ -1,8 +1,10 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+app.use(cors());
 app.use(express.json());
 
 
@@ -101,6 +103,23 @@ app.get("/users", (req, res) => {
 });
 
 
+const generateId = () => {
+    let id = '';
+
+    for(let i = 0; i < 3; i++){
+        id += String.fromCharCode(
+            Math.floor(Math.random() * 26)
+            + 97
+        );
+    }
+
+    for(let i = 0; i < 3; i++){
+        id += Math.floor(Math.random() * 10);
+    }
+
+    return id;
+};
+
 const addUser = (user) => {
     users["users_list"].push(user);
     return user;
@@ -108,8 +127,9 @@ const addUser = (user) => {
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
+    userToAdd.id = generateId();
     addUser(userToAdd);
-    res.send();
+    res.status(201).send(userToAdd);
 });
 
 
@@ -126,7 +146,7 @@ app.delete("/users/:id", (req, res) => {
     const userDeleted = deleteUserById(id);
 
     if(userDeleted) {
-        res.status(200).send();
+        res.status(204).send();
     } else {
         res.status(404).send();
     }
